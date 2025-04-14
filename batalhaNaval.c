@@ -1,81 +1,103 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+#include <stdbool.h>
 
+#define LINHAS 10
+#define COLUNAS 10
 
-int main() {
-    // Array com as letras das colunas (A-J)
-    char coluna[10] = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'};
-    
-    // Array com os números das linhas (1-10)
-    // Observação: seria melhor declarar como int, pois char armazena caracteres
-    int linha[10] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
-
-    // Matriz 10x10 que representa o tabuleiro do jogo
-    // 0 = água, outros números representam navios (no caso, 3 = navio)
-    int tabuleiro[10][10] = {
-        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, // Linha 0
-        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, // Linha 1
-        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, // Linha 2
-        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, // Linha 3
-        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, // Linha 4
-        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, // Linha 5
-        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, // Linha 6
-        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, // Linha 7
-        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, // Linha 8
-        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}  // Linha 9
-    };
-
-    printf("Batalha Naval!!!\n");
-
-    // Imprime o cabeçalho com as letras das colunas (A-J)
-    for (int i = 0; i < 10; i++) {
-        printf(" ");
-        printf("%c", coluna[i]);
+// Função para verificar se é possível posicionar um navio
+bool pode_posicionar(int tabuleiro[LINHAS][COLUNAS], int linha, int coluna, int tamanho, int direcao) {
+    // Verifica limites do tabuleiro
+    if (linha < 0 || linha >= LINHAS || coluna < 0 || coluna >= COLUNAS) {
+        return false;
     }
-    printf("\n");
-    
-    // Imprime o tabuleiro completo com números das linhas
-    for (int i = 0; i < 10; i++) { 
-        // Imprime o número da linha
-        printf("%d ", linha[i]);
-        
-        // Imprime o conteúdo de cada célula do tabuleiro
-        for (int j = 0; j < 10; j++) {
-            printf("%d ", tabuleiro[i][j]);
+
+    // Verifica se todas as posições estão livres
+    for (int i = 0; i < tamanho; i++) {
+        if (direcao == 0) { // Horizontal
+            if (coluna + i >= COLUNAS || tabuleiro[linha][coluna + i] != 0) {
+                return false;
+            }
+        } else if (direcao == 1) { // Vertical
+            if (linha + i >= LINHAS || tabuleiro[linha + i][coluna] != 0) {
+                return false;
+            }
+        } else { // Diagonal (direita para baixo)
+            if (linha + i >= LINHAS || coluna + i >= COLUNAS || tabuleiro[linha + i][coluna + i] != 0) {
+                return false;
+            }
         }
-        printf("\n"); // Quebra de linha após cada linha do tabuleiro
     }
-    
-    // Posicionamento dos navios no tabuleiro
-    // Navio horizontal: posições (1,1), (1,2), (1,3)
-    tabuleiro[1][1] = 3; // 3 representa parte de um navio
-    tabuleiro[1][2] = 3;
-    tabuleiro[1][3] = 3;
-    
-    // Navio vertical: posições (0,5), (1,5), (2,5)
-    tabuleiro[0][5] = 3;
-    tabuleiro[1][5] = 3;
-    tabuleiro[2][5] = 3;
+    return true;
+}
 
-    printf("\n");
-
-    printf("Posicionamento dos Navios!!!\n");
+// Função para posicionar um navio de 3 casas
+void posicionar_navio_3(int tabuleiro[LINHAS][COLUNAS], int direcao) {
+    int linha, coluna;
+    bool posicionado = false;
     
-    // Imprime novamente o cabeçalho com as letras das colunas
-    for (int i = 0; i < 10; i++) {
-        printf(" ");
-        printf("%c", coluna[i]);
-    }
-    printf("\n");
-    
-    // Imprime o tabuleiro novamente, agora com os navios posicionados
-    for (int i = 0; i < 10; i++) { 
-        printf("%d ", linha[i]);
+    // Tenta posicionar até encontrar um local válido
+    while (!posicionado) {
+        linha = rand() % LINHAS;
+        coluna = rand() % COLUNAS;
         
-        for (int j = 0; j < 10; j++) {
+        if (pode_posicionar(tabuleiro, linha, coluna, 3, direcao)) {
+            posicionado = true;
+            
+            // Marca as posições no tabuleiro com o número 3
+            for (int i = 0; i < 3; i++) {
+                if (direcao == 0) { // Horizontal
+                    tabuleiro[linha][coluna + i] = 3;
+                } else if (direcao == 1) { // Vertical
+                    tabuleiro[linha + i][coluna] = 3;
+                } else { // Diagonal
+                    tabuleiro[linha + i][coluna + i] = 3;
+                }
+            }
+        }
+    }
+}
+
+// Função para imprimir o tabuleiro
+void imprimir_tabuleiro(int tabuleiro[LINHAS][COLUNAS]) {
+    char coluna[10] = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'};
+    int linha[10] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+    
+    printf("Tabuleiro Batalha Naval!!!\n");
+    printf("  ");
+    for (int i = 0; i < COLUNAS; i++) {
+        printf("%c ", coluna[i]);
+    }
+    printf("\n");
+
+    for (int i = 0; i < LINHAS; i++) {
+        printf("%d ", linha[i]);
+        for (int j = 0; j < COLUNAS; j++) {
             printf("%d ", tabuleiro[i][j]);
         }
         printf("\n");
     }
+}
+
+int main() {
+    srand(time(NULL)); // Inicializa o gerador de números aleatórios
     
-    return 0; // Fim do programa
+    int tabuleiro[LINHAS][COLUNAS] = {0}; // Inicializa com 0 (água)
+    
+    // Posiciona os navios:
+    // 2 navios horizontais
+    posicionar_navio_3(tabuleiro, 0); // Horizontal
+    posicionar_navio_3(tabuleiro, 0); // Horizontal
+    
+    // 1 navio vertical
+    posicionar_navio_3(tabuleiro, 1); // Vertical
+    
+    // 1 navio diagonal
+    posicionar_navio_3(tabuleiro, 2); // Diagonal
+    
+    // Imprime o tabuleiro
+    imprimir_tabuleiro(tabuleiro);
+    
+    return 0;
 }
