@@ -59,12 +59,125 @@ void posicionar_navio_3(int tabuleiro[LINHAS][COLUNAS], int direcao) {
     }
 }
 
+// Superpoder Cone (5 casas)
+void habilidade_cone(int tabuleiro[LINHAS][COLUNAS]) {
+    int linha, coluna, direcao;
+    bool posicionado = false;
+    
+    printf("\nAtivando superpoder CONE!\n");
+    
+    while (!posicionado) {
+        linha = rand() % LINHAS;
+        coluna = rand() % COLUNAS;
+        direcao = rand() % 4; // 0: direita, 1: baixo, 2: esquerda, 3: cima
+        
+        // Verifica se a posição central está livre
+        if (linha >= 0 && linha < LINHAS && coluna >= 0 && coluna < COLUNAS && 
+            tabuleiro[linha][coluna] == 0) {
+            
+            posicionado = true;
+            tabuleiro[linha][coluna] = 5; // Centro do cone
+            
+            // Adiciona as casas adjacentes conforme a direção
+            switch (direcao) {
+                case 0: // Direita
+                    if (coluna + 1 < COLUNAS) tabuleiro[linha][coluna + 1] = 5;
+                    if (linha > 0 && coluna + 1 < COLUNAS) tabuleiro[linha - 1][coluna + 1] = 5;
+                    if (linha + 1 < LINHAS && coluna + 1 < COLUNAS) tabuleiro[linha + 1][coluna + 1] = 5;
+                    if (coluna + 2 < COLUNAS) tabuleiro[linha][coluna + 2] = 5;
+                    break;
+                case 1: // Baixo
+                    if (linha + 1 < LINHAS) tabuleiro[linha + 1][coluna] = 5;
+                    if (linha + 1 < LINHAS && coluna > 0) tabuleiro[linha + 1][coluna - 1] = 5;
+                    if (linha + 1 < LINHAS && coluna + 1 < COLUNAS) tabuleiro[linha + 1][coluna + 1] = 5;
+                    if (linha + 2 < LINHAS) tabuleiro[linha + 2][coluna] = 5;
+                    break;
+                case 2: // Esquerda
+                    if (coluna > 0) tabuleiro[linha][coluna - 1] = 5;
+                    if (linha > 0 && coluna > 0) tabuleiro[linha - 1][coluna - 1] = 5;
+                    if (linha + 1 < LINHAS && coluna > 0) tabuleiro[linha + 1][coluna - 1] = 5;
+                    if (coluna > 1) tabuleiro[linha][coluna - 2] = 5;
+                    break;
+                case 3: // Cima
+                    if (linha > 0) tabuleiro[linha - 1][coluna] = 5;
+                    if (linha > 0 && coluna > 0) tabuleiro[linha - 1][coluna - 1] = 5;
+                    if (linha > 0 && coluna + 1 < COLUNAS) tabuleiro[linha - 1][coluna + 1] = 5;
+                    if (linha > 1) tabuleiro[linha - 2][coluna] = 5;
+                    break;
+            }
+        }
+    }
+}
+
+// Superpoder Cruz (5 casas)
+void habilidade_cruz(int tabuleiro[LINHAS][COLUNAS]) {
+    int linha, coluna;
+    bool posicionado = false;
+    
+    printf("\nAtivando superpoder CRUZ!\n");
+    
+    while (!posicionado) {
+        linha = 1 + rand() % (LINHAS - 2); // Evita bordas
+        coluna = 1 + rand() % (COLUNAS - 2); // Evita bordas
+        
+        // Verifica se a posição central está livre
+        if (tabuleiro[linha][coluna] == 0) {
+            posicionado = true;
+            
+            // Marca a cruz (5 casas)
+            tabuleiro[linha][coluna] = 5;    // Centro
+            tabuleiro[linha - 1][coluna] = 5; // Cima
+            tabuleiro[linha + 1][coluna] = 5; // Baixo
+            tabuleiro[linha][coluna - 1] = 5; // Esquerda
+            tabuleiro[linha][coluna + 1] = 5; // Direita
+        }
+    }
+}
+
+// Superpoder Octaedro (8 casas em forma de diamante)
+void habilidade_octaedro(int tabuleiro[LINHAS][COLUNAS]) {
+    int linha, coluna;
+    bool posicionado = false;
+    
+    printf("\nAtivando superpoder OCTAEDRO!\n");
+    
+    while (!posicionado) {
+        linha = 2 + rand() % (LINHAS - 4); // Precisa de mais espaço
+        coluna = 2 + rand() % (COLUNAS - 4); // Precisa de mais espaço
+        
+        // Verifica se todas as posições estão livres
+        if (tabuleiro[linha][coluna] == 0 &&
+            tabuleiro[linha - 1][coluna] == 0 &&
+            tabuleiro[linha + 1][coluna] == 0 &&
+            tabuleiro[linha][coluna - 1] == 0 &&
+            tabuleiro[linha][coluna + 1] == 0 &&
+            tabuleiro[linha - 1][coluna - 1] == 0 &&
+            tabuleiro[linha - 1][coluna + 1] == 0 &&
+            tabuleiro[linha + 1][coluna - 1] == 0 &&
+            tabuleiro[linha + 1][coluna + 1] == 0) {
+            
+            posicionado = true;
+            
+            // Marca o octaedro (diamante)
+            tabuleiro[linha][coluna] = 5;       // Centro
+            tabuleiro[linha - 1][coluna] = 5;   // Cima
+            tabuleiro[linha + 1][coluna] = 5;   // Baixo
+            tabuleiro[linha][coluna - 1] = 5;   // Esquerda
+            tabuleiro[linha][coluna + 1] = 5;   // Direita
+            tabuleiro[linha - 1][coluna - 1] = 5; // Diagonal superior esquerda
+            tabuleiro[linha - 1][coluna + 1] = 5; // Diagonal superior direita
+            tabuleiro[linha + 1][coluna - 1] = 5; // Diagonal inferior esquerda
+            tabuleiro[linha + 1][coluna + 1] = 5; // Diagonal inferior direita
+        }
+    }
+}
+
 // Função para imprimir o tabuleiro
 void imprimir_tabuleiro(int tabuleiro[LINHAS][COLUNAS]) {
     char coluna[10] = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'};
     int linha[10] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
     
-    printf("Tabuleiro Batalha Naval!!!\n");
+    printf("\nTabuleiro Batalha Naval!!!\n");
     printf("  ");
     for (int i = 0; i < COLUNAS; i++) {
         printf("%c ", coluna[i]);
@@ -95,9 +208,18 @@ int main() {
     
     // 1 navio diagonal
     posicionar_navio_3(tabuleiro, 2); // Diagonal
-    
-    // Imprime o tabuleiro
+
+    // Imprime o tabuleiro inicial
     imprimir_tabuleiro(tabuleiro);
+    
+    // Ativa os superpoderes
+    habilidade_cone(tabuleiro);
+    habilidade_cruz(tabuleiro);
+    habilidade_octaedro(tabuleiro);
+    
+    // Imprime o tabuleiro com os superpoderes
+    imprimir_tabuleiro(tabuleiro);
+    
     
     return 0;
 }
